@@ -4,121 +4,60 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Amano | Cozinha</title>
-  <meta name="theme-color" content="#062f4f" />
   <style>
-    :root{--navy:#062f4f;--cream:#f8efe2;--paper:#fffaf2;--caramel:#c77932;--olive:#687238;--brown:#6b3f21;--muted:#746a5c;--line:#ead6bd;--danger:#b23b31;--success:#3f7b4b;--shadow:0 16px 38px rgba(28,25,20,.12);--radius:22px}
-    *{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(180deg,var(--cream),#f0dbc1);color:var(--navy);min-height:100vh}button,input,select{font:inherit}button{border:0;cursor:pointer}.wrap{max-width:1360px;margin:0 auto;padding:18px}header{position:sticky;top:0;z-index:20;background:rgba(248,239,226,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(199,121,50,.24)}.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px}.brand{display:flex;gap:12px;align-items:center}.logo{width:46px;height:46px;border-radius:16px;background:var(--navy);color:var(--cream);display:grid;place-items:center;font-family:Georgia,serif;font-size:30px;box-shadow:var(--shadow)}.brand h1{font-family:Georgia,serif;font-size:34px;margin:0;line-height:1}.brand small{text-transform:uppercase;letter-spacing:2px;color:var(--brown);font-weight:800}.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}.pill{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:10px 12px;color:var(--navy);font-weight:900;text-decoration:none}.pill.primary{background:var(--navy);color:#fff;border-color:var(--navy)}.grid-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}.stat{background:rgba(255,250,242,.9);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:0 8px 22px rgba(57,38,19,.08)}.stat span{display:block;color:var(--muted);font-weight:800;font-size:13px}.stat strong{font-family:Georgia,serif;font-size:34px;color:var(--navy)}.toolbar{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:rgba(255,250,242,.85);border:1px solid var(--line);border-radius:var(--radius);padding:12px;margin-bottom:14px}.filters{display:flex;gap:8px;flex-wrap:wrap}.filter{background:#fff6e9;color:var(--brown);border:1px solid var(--line);border-radius:999px;padding:9px 12px;font-weight:900}.filter.active{background:var(--caramel);color:#fff;border-color:var(--caramel)}.search{min-width:240px;border:1px solid var(--line);background:#fffaf3;border-radius:999px;padding:10px 14px;color:var(--navy);outline:none}.layout{display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:start}.orders{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.order{background:rgba(255,250,242,.96);border:1px solid var(--line);border-left:8px solid var(--caramel);border-radius:24px;padding:16px;box-shadow:0 10px 24px rgba(57,38,19,.09)}.order.status-Recebido{border-left-color:var(--caramel)}.order.status-Em\ preparo{border-left-color:var(--navy)}.order.status-Pronto{border-left-color:var(--olive)}.order.status-Saiu\ para\ entrega{border-left-color:#8d5c2c}.order.status-Entregue{border-left-color:var(--success);opacity:.82}.order.status-Cancelado{border-left-color:var(--danger);opacity:.75}.order-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;border-bottom:1px dashed var(--line);padding-bottom:10px;margin-bottom:10px}.order h2{font-family:Georgia,serif;margin:0;font-size:28px}.badge{border-radius:999px;background:#fff1df;color:var(--brown);padding:7px 10px;font-weight:900;font-size:12px;white-space:nowrap}.badge.dark{background:var(--navy);color:#fff}.meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.meta div{background:#fff6e9;border:1px solid var(--line);border-radius:16px;padding:10px;color:var(--brown)}.meta small{display:block;color:var(--muted);font-weight:900;text-transform:uppercase;font-size:10px;letter-spacing:.8px}.items{background:#fffaf3;border:1px solid var(--line);border-radius:18px;padding:12px;margin-top:10px}.items h3,.side h3{font-family:Georgia,serif;margin:0 0 8px;font-size:23px}.items ul{margin:0;padding-left:18px;line-height:1.5}.note{background:#fff2de;border:1px solid #e8caa4;color:var(--brown);border-radius:16px;padding:10px;margin-top:10px}.status-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.status-actions button{border-radius:14px;padding:10px 8px;font-weight:900;background:#fff6e9;color:var(--navy);border:1px solid var(--line)}.status-actions button.active{background:var(--navy);color:#fff;border-color:var(--navy)}.status-actions button.cancel{background:#fff1ed;color:var(--danger)}.side{position:sticky;top:96px;display:grid;gap:14px}.panel{background:rgba(255,250,242,.92);border:1px solid var(--line);border-radius:24px;padding:16px;box-shadow:var(--shadow)}.prod-list{display:grid;gap:8px}.prod-row{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed var(--line);padding:8px 0;color:var(--brown)}.empty{background:rgba(255,250,242,.85);border:1px solid var(--line);border-radius:24px;padding:24px;text-align:center;color:var(--brown);grid-column:1/-1}.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:12px 16px;border-radius:999px;box-shadow:var(--shadow);display:none;z-index:50;font-weight:900}.toast.show{display:block}@media(max-width:1100px){.layout{grid-template-columns:1fr}.side{position:static}.orders{grid-template-columns:1fr}.grid-stats{grid-template-columns:repeat(2,1fr)}}@media(max-width:620px){.wrap{padding:14px}.topbar{align-items:flex-start;flex-wrap:wrap}.actions{justify-content:flex-start}.grid-stats{grid-template-columns:1fr}.meta{grid-template-columns:1fr}.status-actions{grid-template-columns:1fr 1fr}.brand h1{font-size:30px}.search{width:100%;min-width:0}}
+    :root{--navy:#082f57;--cream:#f6eadc;--paper:#fff8ef;--caramel:#b97832;--olive:#676b2c;--ink:#1d2430;--muted:#6c604f;--line:#e2cdb8;--ok:#1f6f4a;--warn:#a85e20;--danger:#9b2c2c;--shadow:0 18px 40px rgba(8,47,87,.12);--radius:22px}
+    *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,var(--cream),#fbf2e8 60%,#f4dfc8);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink)}
+    .top{position:sticky;top:0;z-index:20;background:rgba(8,47,87,.96);color:var(--cream);box-shadow:0 10px 30px rgba(0,0,0,.18)}.top-inner{max-width:1220px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px}.brand{display:flex;gap:10px;align-items:center}.mark{width:42px;height:42px;border-radius:14px;background:var(--cream);color:var(--navy);display:grid;place-items:center;font-family:Georgia,serif;font-size:28px;font-weight:900}.brand h1{font-family:Georgia,serif;margin:0;font-size:31px;line-height:1}.brand small{display:block;text-transform:uppercase;letter-spacing:2px;font-size:10px;color:#e9c8a7;margin-top:3px}.page{max-width:1220px;margin:auto;padding:18px 14px 60px}.toolbar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin:18px 0}.btn{border:0;border-radius:14px;padding:11px 14px;font-weight:900;cursor:pointer;background:var(--navy);color:var(--cream)}.btn.secondary{background:#fff;color:var(--navy);border:1px solid var(--line)}.btn.caramel{background:var(--caramel);color:#fff}.btn.olive{background:var(--olive);color:#fff}.btn.danger{background:var(--danger);color:#fff}.btn:disabled{opacity:.55;cursor:not-allowed}.filters{display:flex;gap:8px;flex-wrap:wrap}.filter{border:1px solid var(--line);border-radius:999px;padding:9px 12px;background:#fff;color:var(--navy);font-weight:900;cursor:pointer}.filter.active{background:var(--caramel);color:white;border-color:var(--caramel)}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:12px 0 18px}.stat{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:14px;box-shadow:var(--shadow)}.stat span{font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase}.stat b{display:block;color:var(--navy);font-size:26px;margin-top:5px}.layout{display:grid;grid-template-columns:1fr 310px;gap:16px}.orders{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.order{background:rgba(255,248,239,.97);border:1px solid var(--line);border-radius:24px;padding:14px;box-shadow:var(--shadow)}.order-head{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed var(--line);padding-bottom:10px;margin-bottom:10px}.order h3{font-family:Georgia,serif;color:var(--navy);margin:0;font-size:25px}.tag{border-radius:999px;padding:6px 9px;font-size:12px;font-weight:900;white-space:nowrap}.tag.recebido{background:#e9f3ff;color:#10426d}.tag.preparo{background:#fff1d6;color:#8b5111}.tag.pronto{background:#e7f7ea;color:#1f6f4a}.tag.entrega{background:#ece8ff;color:#473491}.tag.entregue{background:#e8f1e4;color:#3d652a}.tag.cancelado{background:#f7e5e5;color:#9b2c2c}.meta{display:grid;gap:6px;font-size:13px;color:#3a332c}.meta b{color:var(--navy)}.items{margin:10px 0;padding:10px;border-radius:16px;background:#fff;border:1px solid var(--line)}.item{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px dashed #eee}.item:last-child{border-bottom:0}.obs{background:#fff9e9;border:1px solid #ead7b8;padding:8px;border-radius:12px;margin-top:8px;color:#594124;font-size:13px}.actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}.side{position:sticky;top:86px;align-self:start;display:grid;gap:14px}.panel{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:14px;box-shadow:var(--shadow)}.panel h3{font-family:Georgia,serif;color:var(--navy);margin:0 0 10px}.production-list{display:grid;gap:8px}.prod{display:flex;justify-content:space-between;border-bottom:1px dashed var(--line);padding-bottom:7px}.small{font-size:12px;color:var(--muted)}.empty{background:#fff;border:1px dashed var(--line);border-radius:20px;padding:30px;text-align:center;color:var(--muted);grid-column:1/-1}.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--navy);color:var(--cream);font-weight:900;padding:13px 16px;border-radius:999px;box-shadow:var(--shadow);display:none}.toast.show{display:block}.loading{opacity:.7;pointer-events:none}
+    @media(max-width:920px){.layout{grid-template-columns:1fr}.orders{grid-template-columns:1fr}.side{position:static}.stats{grid-template-columns:repeat(2,1fr)}}@media(max-width:520px){.stats{grid-template-columns:1fr}.toolbar{align-items:stretch}.toolbar .btn{width:100%}.filters{width:100%;overflow:auto;flex-wrap:nowrap;padding-bottom:4px}}
   </style>
 </head>
 <body>
-  <header><div class="wrap topbar"><div class="brand"><div class="logo">A</div><div><h1>Amano</h1><small>Painel da cozinha</small></div></div><div class="actions"><a href="index.html" class="pill">Ver cliente</a><button class="pill" id="seedBtn">Criar pedido teste</button><button class="pill primary" id="refreshBtn">Atualizar</button></div></div></header>
-  <main class="wrap">
-    <section class="grid-stats"><div class="stat"><span>Pedidos do dia</span><strong id="statOrders">0</strong></div><div class="stat"><span>Em produção</span><strong id="statProd">0</strong></div><div class="stat"><span>Entregues</span><strong id="statDone">0</strong></div><div class="stat"><span>Total vendido</span><strong id="statTotal">R$ 0</strong></div></section>
-    <section class="toolbar"><div class="filters" id="filters"></div><input class="search" id="search" placeholder="Buscar por pedido, cliente ou telefone" /></section>
-    <section class="layout"><div class="orders" id="orders"></div><aside class="side"><div class="panel"><h3>Resumo de produção</h3><div id="production" class="prod-list"></div></div><div class="panel"><h3>Entrega 1 — Módulo Cozinha</h3><p style="color:var(--brown);line-height:1.45;margin:0">Tela operacional com pedidos, dados do cliente, itens, observações, pagamento, local de entrega e mudança de status.</p></div><div class="panel"><h3>Próxima etapa</h3><p style="color:var(--brown);line-height:1.45;margin:0">Base Google Sheets conectada. Próxima etapa: integração com WhatsApp.</p></div></aside></section>
+  <header class="top"><div class="top-inner"><div class="brand"><div class="mark">A</div><div><h1>Amano</h1><small>Painel da cozinha</small></div></div><a class="btn secondary" href="index.html">Ver tela do cliente</a></div></header>
+  <main class="page">
+    <div class="toolbar"><div><h2 style="font-family:Georgia,serif;color:var(--navy);font-size:36px;margin:0">Pedidos recebidos</h2><p class="small">Controle de status operacional da cozinha.</p></div><button class="btn caramel" id="refreshBtn" onclick="loadOrders()">Atualizar pedidos</button></div>
+    <div class="filters" id="filters"></div>
+    <section class="stats"><div class="stat"><span>Total vendido</span><b id="statTotal">R$ 0,00</b></div><div class="stat"><span>Pedidos do painel</span><b id="statOrders">0</b></div><div class="stat"><span>Em produção</span><b id="statProduction">0</b></div><div class="stat"><span>Itens</span><b id="statItems">0</b></div></section>
+    <section class="layout"><div class="orders" id="orders"></div><aside class="side"><div class="panel"><h3>Resumo de produção</h3><div id="production" class="production-list"></div></div><div class="panel"><h3>Orientação</h3><p class="small">Clique em <b>Atualizar pedidos</b> para buscar a base. Ao mudar o status, a planilha é atualizada pelo Apps Script.</p></div></aside></section>
   </main>
   <div class="toast" id="toast"></div>
+
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbz1m8mpx1KmvKPtmcyeT7-kDlaIJmF7iSLzdqbPFECOjQ8kWvgJHlzGcf8PUcqFJJf2/exec';
-    const statuses=['Todos','Recebido','Em preparo','Pronto','Saiu para entrega','Entregue','Cancelado'];
-    let currentFilter='Todos';
-    let ordersCache=[];
-    const brl=v=>Number(v || 0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-    const qs=id=>document.getElementById(id);
-    const fmtDate=v=>{ try{ return new Date(v).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}); }catch(e){ return v || '-'; } };
-    function toast(msg){const t=qs('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
-    async function apiGet(params){
-      const url = API_URL + '?' + new URLSearchParams({...params, _: Date.now()}).toString();
-      const res = await fetch(url);
-      if(!res.ok) throw new Error('Erro ao consultar a base');
-      return await res.json();
+    const STATUSES = ['Todos','Recebido','Em preparo','Pronto','Saiu para entrega','Entregue','Cancelado'];
+    let orders = [];
+    let filter = 'Todos';
+    function money(v){ return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
+    function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+    function jsonp(action, data){
+      return new Promise((resolve,reject)=>{
+        const cb='amanoAdminCb_'+Date.now()+'_'+Math.floor(Math.random()*10000);
+        const script=document.createElement('script');
+        const params=new URLSearchParams(); params.set('action',action); params.set('callback',cb); if(data) params.set('payload',JSON.stringify(data));
+        window[cb]=(response)=>{ cleanup(); resolve(response); };
+        function cleanup(){ delete window[cb]; script.remove(); clearTimeout(timer); }
+        const timer=setTimeout(()=>{ cleanup(); reject(new Error('Tempo esgotado ao conectar com a base.')); },20000);
+        script.onerror=()=>{ cleanup(); reject(new Error('Não foi possível conectar ao Apps Script.')); };
+        script.src=API_URL+'?'+params.toString();
+        document.body.appendChild(script);
+      });
     }
-    async function apiPost(action, payload){
-      const res = await fetch(API_URL, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify({action, ...payload})});
-      if(!res.ok) throw new Error('Erro ao gravar na base');
-      return await res.json();
+    function classFor(status){ const s=String(status||'').toLowerCase(); if(s.includes('preparo')) return 'preparo'; if(s.includes('pronto')) return 'pronto'; if(s.includes('entrega') && !s.includes('entregue')) return 'entrega'; if(s.includes('entregue')) return 'entregue'; if(s.includes('cancel')) return 'cancelado'; return 'recebido'; }
+    function renderFilters(){ document.getElementById('filters').innerHTML=STATUSES.map(s=>`<button class="filter ${filter===s?'active':''}" onclick="setFilter('${s}')">${s}</button>`).join(''); }
+    function setFilter(s){ filter=s; renderFilters(); renderOrders(); }
+    async function loadOrders(){ const btn=document.getElementById('refreshBtn'); btn.disabled=true; btn.textContent='Atualizando...'; document.body.classList.add('loading'); try{ const res=await jsonp('listOrders'); if(!res.ok) throw new Error(res.message || 'Erro ao listar pedidos.'); orders=res.pedidos || []; renderOrders(); toast('Pedidos atualizados.'); }catch(e){ toast(e.message); } finally{ btn.disabled=false; btn.textContent='Atualizar pedidos'; document.body.classList.remove('loading'); } }
+    function renderOrders(){
+      const list = filter==='Todos' ? orders : orders.filter(o=>String(o.status)===filter);
+      document.getElementById('orders').innerHTML = list.length ? list.map(orderHtml).join('') : '<div class="empty">Nenhum pedido encontrado para este filtro.</div>';
+      renderStats(list); renderProduction(list);
     }
-    function renderFilters(){qs('filters').innerHTML=statuses.map(s=>`<button class="filter ${s===currentFilter?'active':''}" onclick="setFilter('${s}')">${s}</button>`).join('')}
-    window.setFilter=s=>{currentFilter=s;render()}
-    function normalizeStatusClass(s){return 'status-' + String(s || '').replaceAll(' ','\ ')}
-    function orderItemsHTML(o){ const itens=o.itens || []; return `<ul>${itens.map(i=>`<li><strong>${i.quantidade}x</strong> ${i.prato}${i.observacaoItem?`<br><small>Obs. item: ${i.observacaoItem}</small>`:''}</li>`).join('')}</ul>` }
-    function localEntrega(o){
-      if((o.tipoEntrega || '').toLowerCase().includes('retirada')) return 'Retirada no local';
-      return [o.endereco, o.bairro, o.cidade].filter(Boolean).join(' - ') || '-';
+    function orderHtml(o){
+      const itens = (o.itens||[]).map(i=>`<div class="item"><span><b>${i.quantidade || 1}x</b> ${i.prato || ''}${i.observacaoItem?`<div class="small">Obs item: ${i.observacaoItem}</div>`:''}</span><b>${money(i.subtotalItem || (Number(i.quantidade||1)*Number(i.precoUnitario||0)))}</b></div>`).join('');
+      return `<article class="order"><div class="order-head"><div><h3>${o.idPedido}</h3><span class="small">${o.dataHora || ''}</span></div><span class="tag ${classFor(o.status)}">${o.status || 'Recebido'}</span></div><div class="meta"><div><b>Cliente:</b> ${o.nomeCliente || ''}</div><div><b>WhatsApp:</b> ${o.telefone || ''}</div><div><b>Entrega:</b> ${o.tipoEntrega || ''} • ${o.endereco || 'Retirada'} ${o.bairro?`- ${o.bairro}`:''}</div><div><b>Pagamento:</b> ${o.formaPagamento || ''}</div><div><b>Total:</b> ${money(o.total)}</div></div><div class="items">${itens || '<span class="small">Sem itens detalhados.</span>'}</div>${o.observacaoGeral?`<div class="obs"><b>Obs geral:</b> ${o.observacaoGeral}</div>`:''}<div class="actions">${['Recebido','Em preparo','Pronto','Saiu para entrega','Entregue','Cancelado'].map(s=>`<button class="btn ${s==='Cancelado'?'danger':s==='Entregue'?'olive':''}" onclick="updateStatus('${o.idPedido}','${s}')">${s}</button>`).join('')}</div></article>`;
     }
-    function renderOrder(o){
-      return `<article class="order ${normalizeStatusClass(o.status)}">
-        <div class="order-head"><div><h2>${o.idPedido}</h2><small>${fmtDate(o.dataHora)}</small></div><span class="badge dark">${o.status || 'Recebido'}</span></div>
-        <div class="meta">
-          <div><small>Cliente</small>${o.nomeCliente || '-'}</div>
-          <div><small>WhatsApp</small>${o.telefone || '-'}</div>
-          <div><small>Pagamento</small>${o.formaPagamento || '-'}</div>
-          <div><small>Total</small>${brl(o.total)}</div>
-          <div><small>Entrega</small>${o.tipoEntrega || '-'}</div>
-          <div><small>Local</small>${localEntrega(o)}</div>
-        </div>
-        ${o.referencia?`<div class="note"><strong>Complemento/referência:</strong> ${o.referencia}</div>`:''}
-        <div class="items"><h3>Itens e quantidades</h3>${orderItemsHTML(o)}</div>
-        ${o.observacaoGeral?`<div class="note"><strong>Observação do pedido:</strong> ${o.observacaoGeral}</div>`:''}
-        <div class="status-actions">
-          ${['Recebido','Em preparo','Pronto','Saiu para entrega','Entregue'].map(s=>`<button class="${o.status===s?'active':''}" onclick="updateStatus('${o.idPedido}','${s}')">${s}</button>`).join('')}
-          <button class="cancel" onclick="updateStatus('${o.idPedido}','Cancelado')">Cancelar</button>
-        </div>
-      </article>`
-    }
-    function renderStats(orders){
-      const today=new Date().toISOString().slice(0,10);
-      const day=orders.filter(o=>String(o.dataHora || '').slice(0,10)===today || new Date(o.dataHora).toISOString().slice(0,10)===today);
-      qs('statOrders').textContent=day.length;
-      qs('statProd').textContent=day.filter(o=>['Recebido','Em preparo','Pronto'].includes(o.status)).length;
-      qs('statDone').textContent=day.filter(o=>o.status==='Entregue').length;
-      qs('statTotal').textContent=brl(day.filter(o=>o.status!=='Cancelado').reduce((s,o)=>s+Number(o.total||0),0));
-    }
-    function renderProduction(orders){
-      const counts={};
-      orders.filter(o=>['Recebido','Em preparo','Pronto'].includes(o.status)).forEach(o=>(o.itens||[]).forEach(i=>{counts[i.prato]=(counts[i.prato]||0)+Number(i.quantidade||0)}));
-      const rows=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
-      qs('production').innerHTML=rows.length?rows.map(([name,qty])=>`<div class="prod-row"><span>${name}</span><strong>${qty}</strong></div>`).join(''):'<p style="color:var(--muted);margin:0">Sem itens em produção.</p>'
-    }
-    function render(){
-      renderFilters();
-      const term=qs('search').value.trim().toLowerCase();
-      let orders=[...ordersCache];
-      renderStats(ordersCache); renderProduction(ordersCache);
-      if(currentFilter!=='Todos')orders=orders.filter(o=>o.status===currentFilter);
-      if(term)orders=orders.filter(o=>[o.idPedido,o.nomeCliente,o.telefone,o.endereco,o.bairro,o.cidade].join(' ').toLowerCase().includes(term));
-      qs('orders').innerHTML=orders.length?orders.map(renderOrder).join(''):'<div class="empty"><h2 style="font-family:Georgia,serif;margin-top:0">Nenhum pedido encontrado</h2><p>Quando um pedido for feito pelo cliente, ele aparecerá aqui pela base do Google Sheets.</p></div>'
-    }
-    async function loadOrders(){
-      qs('orders').innerHTML='<div class="empty"><h2 style="font-family:Georgia,serif;margin-top:0">Carregando pedidos...</h2><p>Consultando a base Google Sheets.</p></div>';
-      try{
-        const resp=await apiGet({action:'listOrders'});
-        if(!resp.ok) throw new Error(resp.message || 'Não foi possível listar pedidos');
-        ordersCache=resp.pedidos || [];
-        render();
-      }catch(err){
-        qs('orders').innerHTML=`<div class="empty"><h2 style="font-family:Georgia,serif;margin-top:0">Erro ao carregar</h2><p>${err.message}</p></div>`;
-        toast('Erro na base de dados');
-      }
-    }
-    window.updateStatus=async (idPedido,status)=>{
-      try{
-        toast('Atualizando status...');
-        const resp=await apiPost('updateStatus', {idPedido, status});
-        if(!resp.ok) throw new Error(resp.message || 'Não foi possível atualizar');
-        await loadOrders();
-        toast(`Pedido ${idPedido}: ${status}`);
-      }catch(err){toast('Erro: ' + err.message)}
-    }
-    async function seed(){
-      const d=new Date(); const pad=n=>String(n).padStart(2,'0');
-      const idPedido=`AM-${String(d.getFullYear()).slice(-2)}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
-      const pedido={idPedido,nomeCliente:'Cliente Teste',telefone:'(81) 9 8872-4025',endereco:'Rua Exemplo, 100',bairro:'Boa Viagem',cidade:'Recife',referencia:'Entregar na recepção',tipoEntrega:'Flash / expressa',taxaEntrega:14,formaPagamento:'Pix',subtotal:46.80,total:60.80,status:'Recebido',observacaoGeral:'Sem cebola no picadinho.',itens:[{prato:'Frango Cremoso',quantidade:1,precoUnitario:21.90,subtotalItem:21.90,observacaoItem:''},{prato:'Picadinho ao Molho',quantidade:1,precoUnitario:24.90,subtotalItem:24.90,observacaoItem:'sem cebola'}]};
-      try{const resp=await apiPost('createOrder', {pedido}); if(!resp.ok) throw new Error(resp.message); await loadOrders(); toast('Pedido teste criado na planilha')}catch(err){toast('Erro no teste: '+err.message)}
-    }
-    qs('seedBtn').addEventListener('click',seed);qs('refreshBtn').addEventListener('click',loadOrders);qs('search').addEventListener('input',render);
-    loadOrders();
-    setInterval(loadOrders, 15000);
+    function renderStats(list){ const total=list.filter(o=>String(o.status)!=='Cancelado').reduce((s,o)=>s+Number(o.total||0),0); const prod=list.filter(o=>['Recebido','Em preparo','Pronto'].includes(String(o.status))).length; const itens=list.reduce((s,o)=>s+(o.itens||[]).reduce((a,i)=>a+Number(i.quantidade||1),0),0); document.getElementById('statTotal').textContent=money(total); document.getElementById('statOrders').textContent=list.length; document.getElementById('statProduction').textContent=prod; document.getElementById('statItems').textContent=itens; }
+    function renderProduction(list){ const map={}; list.filter(o=>!['Cancelado','Entregue'].includes(String(o.status))).forEach(o=>(o.itens||[]).forEach(i=>{ const name=i.prato||'Item'; map[name]=(map[name]||0)+Number(i.quantidade||1); })); const rows=Object.entries(map).sort((a,b)=>b[1]-a[1]); document.getElementById('production').innerHTML=rows.length?rows.map(([name,qty])=>`<div class="prod"><span>${name}</span><b>${qty}</b></div>`).join(''):'<p class="small">Sem itens em produção.</p>'; }
+    async function updateStatus(id,status){ try{ const res=await jsonp('updateStatus',{idPedido:id,status}); if(!res.ok) throw new Error(res.message || 'Erro ao atualizar status.'); const order=orders.find(o=>String(o.idPedido)===String(id)); if(order) order.status=status; renderOrders(); toast(`Pedido ${id}: ${status}`); }catch(e){ toast(e.message); } }
+    renderFilters(); loadOrders();
   </script>
 </body>
 </html>
