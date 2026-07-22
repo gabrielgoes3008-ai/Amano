@@ -163,8 +163,10 @@
           <div class="form-grid" style="margin-top:18px">
             <div class="field"><label>Nome do cliente</label><input id="clientName" placeholder="Seu nome" /></div>
             <div class="field"><label>WhatsApp</label><input id="clientPhone" placeholder="(81) 9 9999-9999" /></div>
-            <div class="field full"><label>Endereço / local de entrega</label><input id="address" placeholder="Rua, número, bairro, cidade" /></div>
-            <div class="field"><label>Complemento</label><input id="complement" placeholder="Apto, bloco, referência" /></div>
+            <div class="field full"><label>Endereço / local de entrega</label><input id="address" placeholder="Rua e número" /></div>
+            <div class="field"><label>Bairro</label><input id="district" placeholder="Ex: Boa Viagem" /></div>
+            <div class="field"><label>Cidade</label><input id="city" placeholder="Ex: Recife" /></div>
+            <div class="field"><label>Complemento / referência</label><input id="complement" placeholder="Apto, bloco, referência" /></div>
             <div class="field"><label>Forma de pagamento</label><select id="payment"><option>Pix</option><option>Cartão na entrega</option><option>Dinheiro</option></select></div>
             <div class="field full"><label>Observação geral do pedido</label><textarea id="orderNote" placeholder="Ex: entregar na portaria, sem talher, ligar ao chegar..."></textarea></div>
           </div>
@@ -200,8 +202,8 @@
   <footer>Protótipo Amano • <a href="admin.html">acessar cozinha</a></footer>
 
   <script>
-    const STORE_KEY = 'amanoOrders_v3';
-    const CART_KEY = 'amanoCart_v3';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbz1m8mpx1KmvKPtmcyeT7-kDlaIJmF7iSLzdqbPFECOjQ8kWvgJHlzGcf8PUcqFJJf2/exec';
+    const CART_KEY = 'amanoCart_v4';
     const dishes = [
       {id:'frango-legumes', n:1, color:'navy', name:'Frango Grelhado com Legumes', price:20.90, ingredients:['Arroz branco','Feijão carioca','Filé de frango grelhado','Cenoura, abobrinha e brócolis salteados'], bowl:['beans','rice','orange','green']},
       {id:'carne-panela', n:2, color:'caramel', name:'Carne de Panela', price:24.90, ingredients:['Arroz branco','Purê de batata','Carne de panela desfiada no próprio molho','Vagem na manteiga'], bowl:['rice','potato','dark','green']},
@@ -212,42 +214,47 @@
     const deliveryConfig = { retirada:{label:'Retirada', fee:0}, padrao:{label:'Entrega padrão', fee:8}, flash:{label:'Flash / expressa', fee:14} };
     const statuses = ['Recebido','Em preparo','Pronto','Saiu para entrega','Entregue'];
     let cart = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
-
-    const brl = v => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+    const brl = v => Number(v || 0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
     const qs = id => document.getElementById(id);
     function saveCart(){ localStorage.setItem(CART_KEY, JSON.stringify(cart)); }
-    function getOrders(){ return JSON.parse(localStorage.getItem(STORE_KEY) || '[]'); }
-    function saveOrders(orders){ localStorage.setItem(STORE_KEY, JSON.stringify(orders)); }
-    function toast(msg){ const t=qs('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
-
+    function toast(msg){ const t=qs('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2600); }
+    async function apiGet(params){
+      const url = API_URL + '?' + new URLSearchParams({...params, _: Date.now()}).toString();
+      const res = await fetch(url);
+      if(!res.ok) throw new Error('Erro na consulta da base de dados');
+      return await res.json();
+    }
+    async function apiPost(action, payload){
+      const res = await fetch(API_URL, {
+        method:'POST',
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body: JSON.stringify({action, ...payload})
+      });
+      if(!res.ok) throw new Error('Erro ao gravar na base de dados');
+      return await res.json();
+    }
+    function generateOrderId(){
+      const d = new Date();
+      const pad = n => String(n).padStart(2,'0');
+      return `AM-${String(d.getFullYear()).slice(-2)}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+    }
     function renderMenu(){
       qs('menuGrid').innerHTML = dishes.map(d => `
         <article class="dish">
-          <div class="dish-art">
-            <div class="dish-badge">${d.n}</div>
-            <div class="bowl">${d.bowl.map(c=>`<div class="food ${c}"></div>`).join('')}</div>
-          </div>
+          <div class="dish-art"><div class="dish-badge">${d.n}</div><div class="bowl">${d.bowl.map(c=>`<div class="food ${c}"></div>`).join('')}</div></div>
           <div class="dish-body">
             <h3>${d.name}</h3>
             <ul>${d.ingredients.map(i=>`<li>${i}</li>`).join('')}</ul>
-            <div class="dish-footer">
-              <div class="price"><span class="weight">500g</span>${brl(d.price)}</div>
-              <button class="add ${d.color==='caramel'?'secondary':''}" onclick="addDish('${d.id}')">Adicionar</button>
-            </div>
+            <div class="dish-footer"><div class="price"><span class="weight">500g</span>${brl(d.price)}</div><button class="add ${d.color==='caramel'?'secondary':''}" onclick="addDish('${d.id}')">Adicionar</button></div>
           </div>
         </article>`).join('');
     }
     window.addDish = function(id){
       const found = cart.find(i=>i.id===id && !i.note);
-      if(found) found.qty++;
-      else cart.push({id, qty:1, note:''});
+      if(found) found.qty++; else cart.push({id, qty:1, note:''});
       saveCart(); renderCart(); toast('Prato adicionado ao carrinho');
     }
-    window.changeQty = function(index, delta){
-      cart[index].qty += delta;
-      if(cart[index].qty <= 0) cart.splice(index,1);
-      saveCart(); renderCart();
-    }
+    window.changeQty = function(index, delta){ cart[index].qty += delta; if(cart[index].qty <= 0) cart.splice(index,1); saveCart(); renderCart(); }
     window.updateItemNote = function(index, val){ cart[index].note = val; saveCart(); }
     function currentDelivery(){ return document.querySelector('input[name="delivery"]:checked').value; }
     function calc(){
@@ -267,57 +274,89 @@
             <textarea class="item-note" oninput="updateItemNote(${idx}, this.value)" placeholder="Observação deste prato. Ex: sem cebola, ponto da carne...">${i.note||''}</textarea>
           </div>`}).join('');
       }
-      const c=calc(); qs('subtotal').textContent=brl(c.subtotal); qs('deliveryFee').textContent=brl(c.fee); qs('grandTotal').textContent=brl(c.total);
-      qs('finishOrder').disabled = cart.length === 0;
+      const c=calc(); qs('subtotal').textContent=brl(c.subtotal); qs('deliveryFee').textContent=brl(c.fee); qs('grandTotal').textContent=brl(c.total); qs('finishOrder').disabled = cart.length === 0;
     }
-    function makeOrder(){
+    async function makeOrder(){
       const name=qs('clientName').value.trim(), phone=qs('clientPhone').value.trim(), address=qs('address').value.trim();
+      const district=qs('district') ? qs('district').value.trim() : '';
+      const city=qs('city') ? qs('city').value.trim() : '';
       if(!cart.length) return toast('Adicione pelo menos um prato');
       if(!name || !phone) return toast('Informe nome e WhatsApp');
       if(currentDelivery() !== 'retirada' && !address) return toast('Informe o endereço de entrega');
       const c=calc();
-      const id = 'AM-' + String(Date.now()).slice(-6);
-      const order = {
-        id, createdAt:new Date().toISOString(), status:'Recebido', rating:null, ratingComment:'',
-        customer:{name, phone, address, complement:qs('complement').value.trim()},
-        payment:qs('payment').value, deliveryType:currentDelivery(), deliveryLabel:c.delivery.label,
-        note:qs('orderNote').value.trim(), items:cart.map(i=>({ ...i, dish:dishes.find(d=>d.id===i.id)})),
-        subtotal:c.subtotal, deliveryFee:c.fee, total:c.total
+      const idPedido = generateOrderId();
+      const pedido = {
+        idPedido,
+        nomeCliente: name,
+        telefone: phone,
+        endereco: address,
+        bairro: district,
+        cidade: city,
+        referencia: qs('complement').value.trim(),
+        tipoEntrega: c.delivery.label,
+        taxaEntrega: c.fee,
+        formaPagamento: qs('payment').value,
+        subtotal: c.subtotal,
+        total: c.total,
+        status: 'Recebido',
+        observacaoGeral: qs('orderNote').value.trim(),
+        itens: cart.map(i=>{ const d=dishes.find(x=>x.id===i.id); return {prato:d.name, quantidade:i.qty, precoUnitario:d.price, subtotalItem:d.price*i.qty, observacaoItem:i.note||''}; })
       };
-      const orders=getOrders(); orders.unshift(order); saveOrders(orders);
-      cart=[]; saveCart(); renderCart();
-      qs('receiptArea').innerHTML = receiptHTML(order);
-      qs('trackCode').value = id; renderTrack(order);
-      document.location.hash = 'acompanhar';
-      toast('Pedido registrado para o protótipo');
+      qs('finishOrder').disabled = true;
+      qs('finishOrder').textContent = 'Enviando pedido...';
+      try{
+        const resp = await apiPost('createOrder', {pedido});
+        if(!resp.ok) throw new Error(resp.message || 'Não foi possível criar o pedido');
+        cart=[]; saveCart(); renderCart();
+        qs('receiptArea').innerHTML = receiptHTML(pedido);
+        qs('trackCode').value = resp.idPedido || idPedido;
+        await trackOrder(resp.idPedido || idPedido);
+        document.location.hash = 'acompanhar';
+        toast('Pedido enviado para a cozinha');
+      }catch(err){
+        toast('Erro ao enviar: ' + err.message);
+        qs('receiptArea').innerHTML = `<div class="receipt" style="background:#b23b31"><h3>Pedido não enviado</h3><p>Verifique a conexão com a base de dados e tente novamente.</p><div class="receipt-card">${err.message}</div></div>`;
+      }finally{
+        qs('finishOrder').disabled = cart.length === 0;
+        qs('finishOrder').textContent = 'Finalizar pedido';
+      }
     }
-    function receiptHTML(o){
-      return `<div class="receipt"><h3>Pedido recebido</h3><p>Guarde o número do pedido para acompanhar o andamento.</p><div class="receipt-card"><strong>${o.id}</strong><br>Cliente: ${o.customer.name}<br>Total: ${brl(o.total)}<br>Status: ${o.status}</div></div>`;
-    }
-    function statusStepsHTML(status){
-      const idx = statuses.indexOf(status);
-      return `<div class="steps">${statuses.map((s,i)=>`<div class="step ${i<idx?'done':''} ${i===idx?'active':''}">${s}</div>`).join('')}</div>`;
+    function receiptHTML(o){ return `<div class="receipt"><h3>Pedido recebido</h3><p>Seu pedido foi enviado para a cozinha. Guarde o número abaixo.</p><div class="receipt-card"><strong>${o.idPedido}</strong><br>Cliente: ${o.nomeCliente}<br>Total: ${brl(o.total)}<br>Status: ${o.status}</div></div>`; }
+    function statusStepsHTML(status){ const idx = statuses.indexOf(status); return `<div class="steps">${statuses.map((s,i)=>`<div class="step ${i<idx?'done':''} ${i===idx?'active':''}">${s}</div>`).join('')}</div>`; }
+    function itensHTML(order){ const itens = order.itens || []; return itens.length ? itens.map(i=>`${i.quantidade}x ${i.prato}${i.observacaoItem ? ` <small>(${i.observacaoItem})</small>` : ''}`).join('<br>') : 'Itens não localizados'; }
+    async function trackOrder(id){
+      if(!id) return toast('Informe o número do pedido');
+      qs('trackResult').innerHTML = '<p style="color:var(--muted);font-weight:800">Buscando pedido...</p>';
+      try{
+        const resp = await apiGet({action:'getOrderStatus', idPedido:id});
+        if(!resp.ok) throw new Error(resp.message || 'Pedido não encontrado');
+        renderTrack(resp.pedido);
+      }catch(err){ qs('trackResult').innerHTML = `<p style="color:var(--danger);font-weight:800">${err.message}</p>`; }
     }
     function renderTrack(order){
-      if(!order){ qs('trackResult').innerHTML = '<p style="color:var(--danger);font-weight:800">Pedido não encontrado neste protótipo.</p>'; return; }
-      const items = order.items.map(i=>`${i.qty}x ${i.dish.name}`).join('<br>');
+      const status = order.status || 'Recebido';
       qs('trackResult').innerHTML = `
         <div class="receipt" style="background:#fffaf2;color:var(--navy);border:1px solid var(--line)">
-          <h3 style="color:var(--navy)">${order.id}</h3>
-          <p style="color:var(--brown)"><strong>Status atual:</strong> ${order.status}</p>
-          ${statusStepsHTML(order.status)}
-          <div class="receipt-card" style="background:#fff6e9;color:var(--brown);border-color:var(--line)"><strong>Itens</strong><br>${items}<br><br><strong>Total:</strong> ${brl(order.total)}<br><strong>Entrega:</strong> ${order.deliveryLabel}</div>
-          ${order.status==='Entregue' ? ratingHTML(order) : '<p style="color:var(--muted)">A avaliação ficará disponível quando o pedido for marcado como entregue.</p>'}
+          <h3 style="color:var(--navy)">${order.idPedido}</h3>
+          <p style="color:var(--brown)"><strong>Status atual:</strong> ${status}</p>
+          ${statusStepsHTML(status)}
+          <div class="receipt-card" style="background:#fff6e9;color:var(--brown);border-color:var(--line)"><strong>Itens</strong><br>${itensHTML(order)}<br><br><strong>Total:</strong> ${brl(order.total)}<br><strong>Entrega:</strong> ${order.tipoEntrega || '-'}</div>
+          ${status==='Entregue' ? ratingHTML(order.idPedido) : '<p style="color:var(--muted)">A avaliação ficará disponível quando o pedido for marcado como entregue.</p>'}
         </div>`;
     }
-    function ratingHTML(order){
-      return `<div style="margin-top:14px"><h3 style="font-family:Georgia,serif">Avalie seu pedido</h3><div class="rating-stars">${[1,2,3,4,5].map(n=>`<button class="star ${order.rating===n?'selected':''}" onclick="rateOrder('${order.id}',${n})">${'★'.repeat(n)}</button>`).join('')}</div><textarea id="ratingComment" placeholder="Conte como foi sua experiência...">${order.ratingComment||''}</textarea><button class="finish" onclick="saveRatingComment('${order.id}')">Salvar avaliação</button></div>`;
+    function ratingHTML(idPedido){
+      return `<div style="margin-top:14px"><h3 style="font-family:Georgia,serif">Avalie seu pedido</h3><div class="rating-stars">${[1,2,3,4,5].map(n=>`<button class="star" onclick="rateOrder('${idPedido}',${n}, this)">${'★'.repeat(n)}</button>`).join('')}</div><textarea id="ratingComment" placeholder="Conte como foi sua experiência..."></textarea><button class="finish" onclick="saveReview('${idPedido}')">Salvar avaliação</button></div>`;
     }
-    window.rateOrder=function(id,n){ const orders=getOrders(); const o=orders.find(x=>x.id===id); if(o){o.rating=n; saveOrders(orders); renderTrack(o); toast('Nota salva');} }
-    window.saveRatingComment=function(id){ const orders=getOrders(); const o=orders.find(x=>x.id===id); if(o){o.ratingComment=qs('ratingComment').value; saveOrders(orders); renderTrack(o); toast('Avaliação salva');} }
+    let selectedRating = 0;
+    window.rateOrder=function(id,n,btn){ selectedRating=n; document.querySelectorAll('.star').forEach(s=>s.classList.remove('selected')); btn.classList.add('selected'); toast('Nota selecionada'); }
+    window.saveReview=async function(id){
+      if(!selectedRating) return toast('Selecione uma nota');
+      try{ const resp = await apiPost('createReview', {avaliacao:{idPedido:id, nota:selectedRating, comentario:qs('ratingComment').value.trim()}}); if(!resp.ok) throw new Error(resp.message); toast('Avaliação enviada'); }
+      catch(err){ toast('Erro ao avaliar: ' + err.message); }
+    }
     qs('finishOrder').addEventListener('click', makeOrder);
     document.querySelectorAll('input[name="delivery"]').forEach(r=>r.addEventListener('change', renderCart));
-    qs('trackBtn').addEventListener('click', ()=>{ const code=qs('trackCode').value.trim().toUpperCase(); const order=getOrders().find(o=>o.id.toUpperCase()===code); renderTrack(order); });
+    qs('trackBtn').addEventListener('click', ()=>trackOrder(qs('trackCode').value.trim().toUpperCase()));
     renderMenu(); renderCart();
   </script>
 </body>

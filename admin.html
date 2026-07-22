@@ -15,30 +15,110 @@
   <main class="wrap">
     <section class="grid-stats"><div class="stat"><span>Pedidos do dia</span><strong id="statOrders">0</strong></div><div class="stat"><span>Em produção</span><strong id="statProd">0</strong></div><div class="stat"><span>Entregues</span><strong id="statDone">0</strong></div><div class="stat"><span>Total vendido</span><strong id="statTotal">R$ 0</strong></div></section>
     <section class="toolbar"><div class="filters" id="filters"></div><input class="search" id="search" placeholder="Buscar por pedido, cliente ou telefone" /></section>
-    <section class="layout"><div class="orders" id="orders"></div><aside class="side"><div class="panel"><h3>Resumo de produção</h3><div id="production" class="prod-list"></div></div><div class="panel"><h3>Entrega 1 — Módulo Cozinha</h3><p style="color:var(--brown);line-height:1.45;margin:0">Tela operacional com pedidos, dados do cliente, itens, observações, pagamento, local de entrega e mudança de status.</p></div><div class="panel"><h3>Próxima etapa</h3><p style="color:var(--brown);line-height:1.45;margin:0">Depois conectamos WhatsApp e uma base online para sincronizar entre aparelhos.</p></div></aside></section>
+    <section class="layout"><div class="orders" id="orders"></div><aside class="side"><div class="panel"><h3>Resumo de produção</h3><div id="production" class="prod-list"></div></div><div class="panel"><h3>Entrega 1 — Módulo Cozinha</h3><p style="color:var(--brown);line-height:1.45;margin:0">Tela operacional com pedidos, dados do cliente, itens, observações, pagamento, local de entrega e mudança de status.</p></div><div class="panel"><h3>Próxima etapa</h3><p style="color:var(--brown);line-height:1.45;margin:0">Base Google Sheets conectada. Próxima etapa: integração com WhatsApp.</p></div></aside></section>
   </main>
   <div class="toast" id="toast"></div>
   <script>
-    const STORE_KEY='amanoOrders_v3';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbz1m8mpx1KmvKPtmcyeT7-kDlaIJmF7iSLzdqbPFECOjQ8kWvgJHlzGcf8PUcqFJJf2/exec';
     const statuses=['Todos','Recebido','Em preparo','Pronto','Saiu para entrega','Entregue','Cancelado'];
     let currentFilter='Todos';
-    const brl=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+    let ordersCache=[];
+    const brl=v=>Number(v || 0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
     const qs=id=>document.getElementById(id);
-    const fmtDate=iso=>new Date(iso).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
-    function getOrders(){return JSON.parse(localStorage.getItem(STORE_KEY)||'[]')}
-    function saveOrders(o){localStorage.setItem(STORE_KEY,JSON.stringify(o))}
-    function toast(msg){const t=qs('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}
+    const fmtDate=v=>{ try{ return new Date(v).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}); }catch(e){ return v || '-'; } };
+    function toast(msg){const t=qs('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+    async function apiGet(params){
+      const url = API_URL + '?' + new URLSearchParams({...params, _: Date.now()}).toString();
+      const res = await fetch(url);
+      if(!res.ok) throw new Error('Erro ao consultar a base');
+      return await res.json();
+    }
+    async function apiPost(action, payload){
+      const res = await fetch(API_URL, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify({action, ...payload})});
+      if(!res.ok) throw new Error('Erro ao gravar na base');
+      return await res.json();
+    }
     function renderFilters(){qs('filters').innerHTML=statuses.map(s=>`<button class="filter ${s===currentFilter?'active':''}" onclick="setFilter('${s}')">${s}</button>`).join('')}
     window.setFilter=s=>{currentFilter=s;render()}
-    function statusClass(s){return 'status-'+s.replaceAll(' ','\\ ')}
-    function orderItemsHTML(o){return `<ul>${o.items.map(i=>`<li><strong>${i.qty}x</strong> ${i.dish.name}${i.note?`<br><small>Obs. item: ${i.note}</small>`:''}</li>`).join('')}</ul>`}
-    function renderOrder(o){return `<article class="order ${statusClass(o.status)}"><div class="order-head"><div><h2>${o.id}</h2><small>${fmtDate(o.createdAt)}</small></div><span class="badge dark">${o.status}</span></div><div class="meta"><div><small>Cliente</small>${o.customer.name}</div><div><small>WhatsApp</small>${o.customer.phone}</div><div><small>Pagamento</small>${o.payment}</div><div><small>Total</small>${brl(o.total)}</div><div><small>Entrega</small>${o.deliveryLabel}</div><div><small>Local</small>${o.deliveryType==='retirada'?'Retirada no local':o.customer.address}</div></div>${o.customer.complement?`<div class="note"><strong>Complemento/referência:</strong> ${o.customer.complement}</div>`:''}<div class="items"><h3>Itens e quantidades</h3>${orderItemsHTML(o)}</div>${o.note?`<div class="note"><strong>Observação do pedido:</strong> ${o.note}</div>`:''}${o.rating?`<div class="note"><strong>Avaliação:</strong> ${'★'.repeat(o.rating)} ${o.ratingComment?`<br>${o.ratingComment}`:''}</div>`:''}<div class="status-actions">${['Recebido','Em preparo','Pronto','Saiu para entrega','Entregue'].map(s=>`<button class="${o.status===s?'active':''}" onclick="updateStatus('${o.id}','${s}')">${s}</button>`).join('')}<button class="cancel" onclick="updateStatus('${o.id}','Cancelado')">Cancelar</button></div></article>`}
-    function renderStats(orders){const today=new Date().toISOString().slice(0,10);const day=orders.filter(o=>o.createdAt.slice(0,10)===today);qs('statOrders').textContent=day.length;qs('statProd').textContent=day.filter(o=>['Recebido','Em preparo','Pronto'].includes(o.status)).length;qs('statDone').textContent=day.filter(o=>o.status==='Entregue').length;qs('statTotal').textContent=brl(day.filter(o=>o.status!=='Cancelado').reduce((s,o)=>s+o.total,0));}
-    function renderProduction(orders){const counts={};orders.filter(o=>['Recebido','Em preparo','Pronto'].includes(o.status)).forEach(o=>o.items.forEach(i=>{counts[i.dish.name]=(counts[i.dish.name]||0)+i.qty}));const rows=Object.entries(counts).sort((a,b)=>b[1]-a[1]);qs('production').innerHTML=rows.length?rows.map(([name,qty])=>`<div class="prod-row"><span>${name}</span><strong>${qty}</strong></div>`).join(''):'<p style="color:var(--muted);margin:0">Sem itens em produção.</p>'}
-    function render(){renderFilters();const term=qs('search').value.trim().toLowerCase();let orders=getOrders();renderStats(orders);renderProduction(orders);if(currentFilter!=='Todos')orders=orders.filter(o=>o.status===currentFilter);if(term)orders=orders.filter(o=>[o.id,o.customer.name,o.customer.phone,o.customer.address].join(' ').toLowerCase().includes(term));qs('orders').innerHTML=orders.length?orders.map(renderOrder).join(''):'<div class="empty"><h2 style="font-family:Georgia,serif;margin-top:0">Nenhum pedido encontrado</h2><p>Os pedidos criados no protótipo do cliente aparecerão aqui neste navegador.</p></div>'}
-    window.updateStatus=(id,status)=>{const orders=getOrders();const o=orders.find(x=>x.id===id);if(o){o.status=status;saveOrders(orders);render();toast(`Pedido ${id}: ${status}`)}}
-    function seed(){const id='AM-'+String(Date.now()).slice(-6);const o={id,createdAt:new Date().toISOString(),status:'Recebido',customer:{name:'Cliente Teste',phone:'(81) 9 8872-4025',address:'Rua Exemplo, 100 - Recife',complement:'Entregar na recepção'},payment:'Pix',deliveryType:'flash',deliveryLabel:'Flash / expressa',note:'Sem cebola no picadinho.',subtotal:46.80,deliveryFee:14,total:60.80,rating:null,ratingComment:'',items:[{id:'frango-cremoso',qty:1,note:'',dish:{name:'Frango Cremoso',price:21.90}},{id:'picadinho',qty:1,note:'sem cebola',dish:{name:'Picadinho ao Molho',price:24.90}}]};const orders=getOrders();orders.unshift(o);saveOrders(orders);render();toast('Pedido teste criado')}
-    qs('seedBtn').addEventListener('click',seed);qs('refreshBtn').addEventListener('click',render);qs('search').addEventListener('input',render);window.addEventListener('storage',render);render();
+    function normalizeStatusClass(s){return 'status-' + String(s || '').replaceAll(' ','\ ')}
+    function orderItemsHTML(o){ const itens=o.itens || []; return `<ul>${itens.map(i=>`<li><strong>${i.quantidade}x</strong> ${i.prato}${i.observacaoItem?`<br><small>Obs. item: ${i.observacaoItem}</small>`:''}</li>`).join('')}</ul>` }
+    function localEntrega(o){
+      if((o.tipoEntrega || '').toLowerCase().includes('retirada')) return 'Retirada no local';
+      return [o.endereco, o.bairro, o.cidade].filter(Boolean).join(' - ') || '-';
+    }
+    function renderOrder(o){
+      return `<article class="order ${normalizeStatusClass(o.status)}">
+        <div class="order-head"><div><h2>${o.idPedido}</h2><small>${fmtDate(o.dataHora)}</small></div><span class="badge dark">${o.status || 'Recebido'}</span></div>
+        <div class="meta">
+          <div><small>Cliente</small>${o.nomeCliente || '-'}</div>
+          <div><small>WhatsApp</small>${o.telefone || '-'}</div>
+          <div><small>Pagamento</small>${o.formaPagamento || '-'}</div>
+          <div><small>Total</small>${brl(o.total)}</div>
+          <div><small>Entrega</small>${o.tipoEntrega || '-'}</div>
+          <div><small>Local</small>${localEntrega(o)}</div>
+        </div>
+        ${o.referencia?`<div class="note"><strong>Complemento/referência:</strong> ${o.referencia}</div>`:''}
+        <div class="items"><h3>Itens e quantidades</h3>${orderItemsHTML(o)}</div>
+        ${o.observacaoGeral?`<div class="note"><strong>Observação do pedido:</strong> ${o.observacaoGeral}</div>`:''}
+        <div class="status-actions">
+          ${['Recebido','Em preparo','Pronto','Saiu para entrega','Entregue'].map(s=>`<button class="${o.status===s?'active':''}" onclick="updateStatus('${o.idPedido}','${s}')">${s}</button>`).join('')}
+          <button class="cancel" onclick="updateStatus('${o.idPedido}','Cancelado')">Cancelar</button>
+        </div>
+      </article>`
+    }
+    function renderStats(orders){
+      const today=new Date().toISOString().slice(0,10);
+      const day=orders.filter(o=>String(o.dataHora || '').slice(0,10)===today || new Date(o.dataHora).toISOString().slice(0,10)===today);
+      qs('statOrders').textContent=day.length;
+      qs('statProd').textContent=day.filter(o=>['Recebido','Em preparo','Pronto'].includes(o.status)).length;
+      qs('statDone').textContent=day.filter(o=>o.status==='Entregue').length;
+      qs('statTotal').textContent=brl(day.filter(o=>o.status!=='Cancelado').reduce((s,o)=>s+Number(o.total||0),0));
+    }
+    function renderProduction(orders){
+      const counts={};
+      orders.filter(o=>['Recebido','Em preparo','Pronto'].includes(o.status)).forEach(o=>(o.itens||[]).forEach(i=>{counts[i.prato]=(counts[i.prato]||0)+Number(i.quantidade||0)}));
+      const rows=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+      qs('production').innerHTML=rows.length?rows.map(([name,qty])=>`<div class="prod-row"><span>${name}</span><strong>${qty}</strong></div>`).join(''):'<p style="color:var(--muted);margin:0">Sem itens em produção.</p>'
+    }
+    function render(){
+      renderFilters();
+      const term=qs('search').value.trim().toLowerCase();
+      let orders=[...ordersCache];
+      renderStats(ordersCache); renderProduction(ordersCache);
+      if(currentFilter!=='Todos')orders=orders.filter(o=>o.status===currentFilter);
+      if(term)orders=orders.filter(o=>[o.idPedido,o.nomeCliente,o.telefone,o.endereco,o.bairro,o.cidade].join(' ').toLowerCase().includes(term));
+      qs('orders').innerHTML=orders.length?orders.map(renderOrder).join(''):'<div class="empty"><h2 style="font-family:Georgia,serif;margin-top:0">Nenhum pedido encontrado</h2><p>Quando um pedido for feito pelo cliente, ele aparecerá aqui pela base do Google Sheets.</p></div>'
+    }
+    async function loadOrders(){
+      qs('orders').innerHTML='<div class="empty"><h2 style="font-family:Georgia,serif;margin-top:0">Carregando pedidos...</h2><p>Consultando a base Google Sheets.</p></div>';
+      try{
+        const resp=await apiGet({action:'listOrders'});
+        if(!resp.ok) throw new Error(resp.message || 'Não foi possível listar pedidos');
+        ordersCache=resp.pedidos || [];
+        render();
+      }catch(err){
+        qs('orders').innerHTML=`<div class="empty"><h2 style="font-family:Georgia,serif;margin-top:0">Erro ao carregar</h2><p>${err.message}</p></div>`;
+        toast('Erro na base de dados');
+      }
+    }
+    window.updateStatus=async (idPedido,status)=>{
+      try{
+        toast('Atualizando status...');
+        const resp=await apiPost('updateStatus', {idPedido, status});
+        if(!resp.ok) throw new Error(resp.message || 'Não foi possível atualizar');
+        await loadOrders();
+        toast(`Pedido ${idPedido}: ${status}`);
+      }catch(err){toast('Erro: ' + err.message)}
+    }
+    async function seed(){
+      const d=new Date(); const pad=n=>String(n).padStart(2,'0');
+      const idPedido=`AM-${String(d.getFullYear()).slice(-2)}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+      const pedido={idPedido,nomeCliente:'Cliente Teste',telefone:'(81) 9 8872-4025',endereco:'Rua Exemplo, 100',bairro:'Boa Viagem',cidade:'Recife',referencia:'Entregar na recepção',tipoEntrega:'Flash / expressa',taxaEntrega:14,formaPagamento:'Pix',subtotal:46.80,total:60.80,status:'Recebido',observacaoGeral:'Sem cebola no picadinho.',itens:[{prato:'Frango Cremoso',quantidade:1,precoUnitario:21.90,subtotalItem:21.90,observacaoItem:''},{prato:'Picadinho ao Molho',quantidade:1,precoUnitario:24.90,subtotalItem:24.90,observacaoItem:'sem cebola'}]};
+      try{const resp=await apiPost('createOrder', {pedido}); if(!resp.ok) throw new Error(resp.message); await loadOrders(); toast('Pedido teste criado na planilha')}catch(err){toast('Erro no teste: '+err.message)}
+    }
+    qs('seedBtn').addEventListener('click',seed);qs('refreshBtn').addEventListener('click',loadOrders);qs('search').addEventListener('input',render);
+    loadOrders();
+    setInterval(loadOrders, 15000);
   </script>
 </body>
 </html>
